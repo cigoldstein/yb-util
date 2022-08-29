@@ -2,44 +2,24 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	"main/bin"
-	"main/log"
 	"os"
+
+	"github.com/blang/vfs"
+	"github.com/spf13/cobra"
+	ytCmd "github.com/yugabyte/yb-tools/yugatool/cmd"
+	ywcCmd "github.com/yugabyte/yb-tools/yugaware-client/cmd"
+
+	"main/log"
 )
 
 var logger = log.Log()
 
-var filesFlag []string
-var caseNumFlag int = 0
-var emailFlag string
-var dropzoneIdFlag string
-
 var rootCmd = &cobra.Command{
-	Use:   "yb_log_uploader",
-	Short: "utility to upload logs to yugabyte support",
+	Use:   "yb-util",
+	Short: "Collection of yugabyte utilities",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
-	},
-}
-
-var yugatoolCmd = &cobra.Command{
-	Use:   "db",
-	Short: "yugatool",
-	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		logger.Info("Running yugatool")
-		bin.ExecYt("")
-	},
-}
-
-var ywClientCmd = &cobra.Command{
-	Use:   "api",
-	Short: "Interact with the Yugaware API",
-	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		logger.Info("Running yugaware-client")
-		bin.ExecYwc("")
+		os.Exit(0)
 	},
 }
 
@@ -56,19 +36,12 @@ func Execute() {
 
 func init() {
 
-	rootCmd.AddCommand(yugatoolCmd)
-	rootCmd.AddCommand(ywClientCmd)
+	// import as type "cobra.Command" from github repos
+	importYtCmd := ytCmd.RootInit(vfs.OS())
+	importYwcCmd := ywcCmd.RootInit()
 
-	//rootCmd.Flags().StringSliceVarP(&filesFlag, "files", "f", nil, "List of files to upload")
-	//rootCmd.Flags().IntVarP(&caseNumFlag, "case_num", "c", 0, "Zendesk case number to attach files to (required)")
-	//rootCmd.Flags().StringVarP(&emailFlag, "email", "e", "", "Email address of submitter (required)")
-	//rootCmd.Flags().StringVar(&dropzoneIdFlag, "dropzone_id", "S4dsLt2meOtq1iWgBhqJYsuEe2nzvYuv03j_Y6LqhY0", "Override default dropzone ID")
-	//
-	//rootCmd.MarkFlagRequired("case_num")
-	//rootCmd.MarkFlagRequired("email")
-	//rootCmd.Flags().MarkHidden("dropzone_id")
+	// add new cobra commands to our root cobra commands
+	rootCmd.AddCommand(importYtCmd)
+	rootCmd.AddCommand(importYwcCmd)
 
-}
-
-func main() {
 }
