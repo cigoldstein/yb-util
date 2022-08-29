@@ -1,9 +1,10 @@
 package log
 
 import (
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
 )
 
 func Log() zap.SugaredLogger {
@@ -13,14 +14,17 @@ func Log() zap.SugaredLogger {
 	consoleEncoder := zapcore.NewConsoleEncoder(config)
 	defaultConsoleLogLevel := zap.InfoLevel
 
-	fileEncoder := zapcore.NewConsoleEncoder(config)
-	defaultFileLogLevel := zap.DebugLevel
-	logFile, _ := os.OpenFile("text.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	writer := zapcore.AddSync(logFile)
+	// uncomment for logging to file
+	//fileEncoder := zapcore.NewConsoleEncoder(config)
+	//defaultFileLogLevel := zap.DebugLevel
+	//logFile, _ := os.OpenFile("text.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	//writer := zapcore.AddSync(logFile)
 
 	core := zapcore.NewTee(
 		zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), defaultConsoleLogLevel),
-		zapcore.NewCore(fileEncoder, writer, defaultFileLogLevel),
+
+		// uncomment for logging to file
+		//zapcore.NewCore(fileEncoder, writer, defaultFileLogLevel),
 	)
 	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
